@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Ship } from '../race/Ship';
+import { ContinentsMapDecor } from '../race/ContinentsMapDecor';
 import { Play, Volume2, VolumeX, Compass, Anchor, Maximize, Minimize } from 'lucide-react';
 
 interface StartScreenProps {
@@ -52,6 +53,9 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           <path d="M0,15 Q10,0 20,10 Q30,0 40,15 Q30,8 20,12 Q10,8 0,15 Z" />
         </svg>
       </div>
+
+      {/* Continents Floating in the Ocean Waters */}
+      <ContinentsMapDecor />
 
       {/* Multi-layered Animated Ocean Waves at Bottom */}
       <div className="absolute inset-x-0 bottom-0 h-44 sm:h-64 pointer-events-none overflow-hidden z-10">
