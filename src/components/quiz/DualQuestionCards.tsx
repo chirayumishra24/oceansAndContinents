@@ -4,7 +4,7 @@ import { RoundEvaluation } from '../../hooks/useGame';
 import { TimerRing } from './TimerRing';
 import { SkipButton } from './SkipButton';
 import { AnswerButton } from './AnswerButton';
-import { Compass, Sparkles, CheckCircle, XCircle } from 'lucide-react';
+import { Compass, Sparkles, CheckCircle, XCircle, Anchor } from 'lucide-react';
 
 interface DualQuestionCardsProps {
   roundNumber: number;
@@ -27,7 +27,6 @@ interface DualQuestionCardsProps {
 
 export const DualQuestionCards: React.FC<DualQuestionCardsProps> = ({
   roundNumber,
-  totalRounds,
   timeLeft,
   isUrgent,
   roundStatus,
@@ -74,50 +73,15 @@ export const DualQuestionCards: React.FC<DualQuestionCardsProps> = ({
   }, [isAnswering, redQuestion.options.length, blueQuestion.options.length, onRedAnswer, onBlueAnswer]);
 
   return (
-    <div className="w-full flex flex-col gap-3 select-none">
+    <div className="w-full select-none">
       
-      {/* Central Round Status Bar & Timer */}
-      <div className="flex items-center justify-between px-4 py-2 rounded-2xl bg-gradient-to-r from-ocean-deep via-ocean-abyss to-slate-950 border-2 border-amber-400/80 shadow-xl text-white">
-        
-        {/* Left Team indicator */}
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-red-500 animate-ping" />
-          <span className="text-xs sm:text-sm font-black uppercase text-red-400">
-            Team Red: {redSelected !== null ? 'Answer Locked' : 'Answering...'}
-          </span>
-        </div>
-
-        {/* Center: Timer & Round Counter */}
-        <div className="flex items-center gap-4">
-          <div className="text-center">
-            <span className="text-[10px] font-bold text-sky-300 uppercase tracking-wider block">
-              ROUND
-            </span>
-            <span className="text-base sm:text-xl font-black font-display text-amber-300">
-              {roundNumber}
-            </span>
-          </div>
-
-          <TimerRing seconds={timeLeft} maxSeconds={15} isUrgent={isUrgent} />
-        </div>
-
-        {/* Right Team indicator */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs sm:text-sm font-black uppercase text-blue-400">
-            Team Blue: {blueSelected !== null ? 'Answer Locked' : 'Answering...'}
-          </span>
-          <span className="w-3 h-3 rounded-full bg-blue-500 animate-ping" />
-        </div>
-
-      </div>
-
-      {/* Dual Split Cards: Team Red on Left, Team Blue on Right */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* 3-Section Layout: Team Red on Left, Central Timer Pillar Between, Team Blue on Right */}
+      <div className="flex flex-col lg:flex-row items-stretch gap-4 sm:gap-5 w-full">
         
         {/* ======================================================== */}
-        {/* TEAM RED QUESTION CARD */}
+        {/* 1. TEAM RED QUESTION CARD */}
         {/* ======================================================== */}
-        <div className={`relative rounded-2xl p-4 sm:p-5 flex flex-col justify-between border-4 transition-all shadow-2xl bg-gradient-to-b from-rose-950 via-slate-950 to-slate-900 ${
+        <div className={`flex-1 order-1 relative rounded-2xl p-4 sm:p-5 flex flex-col justify-between border-4 transition-all shadow-2xl bg-gradient-to-b from-rose-950 via-slate-950 to-slate-900 ${
           redSelected !== null && !isEvaluating ? 'border-amber-400 ring-2 ring-amber-400/50' : 'border-red-500/80'
         }`}>
           
@@ -206,9 +170,58 @@ export const DualQuestionCards: React.FC<DualQuestionCardsProps> = ({
         </div>
 
         {/* ======================================================== */}
-        {/* TEAM BLUE QUESTION CARD */}
+        {/* 2. BETWEEN: CENTRAL ROUND STATUS & TIMER PILLAR */}
         {/* ======================================================== */}
-        <div className={`relative rounded-2xl p-4 sm:p-5 flex flex-col justify-between border-4 transition-all shadow-2xl bg-gradient-to-b from-blue-950 via-slate-950 to-slate-900 ${
+        <div className="order-2 w-full lg:w-44 xl:w-48 shrink-0 rounded-2xl bg-gradient-to-b from-ocean-deep via-ocean-abyss to-slate-950 border-2 border-amber-400/80 shadow-2xl p-3 sm:p-4 flex flex-row lg:flex-col items-center justify-between gap-3 text-white">
+          
+          {/* Team Red Status */}
+          <div className="flex flex-col items-center text-center">
+            <span className="text-[11px] font-black uppercase text-red-400 flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+              TEAM RED
+            </span>
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-300 mt-0.5">
+              {redSelected !== null ? '✓ Locked' : 'Answering...'}
+            </span>
+          </div>
+
+          {/* Center Round & Timer Ring */}
+          <div className="flex flex-col items-center gap-2">
+            <div className="text-center">
+              <span className="text-[10px] font-bold text-sky-300 uppercase tracking-widest block">
+                ROUND
+              </span>
+              <span className="text-2xl sm:text-3xl font-black font-display text-amber-300 drop-shadow leading-none">
+                {roundNumber}
+              </span>
+            </div>
+
+            <TimerRing seconds={timeLeft} maxSeconds={15} isUrgent={isUrgent} />
+
+            <div className="hidden lg:flex items-center gap-1 px-3 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-[11px] font-black text-amber-300 shadow">
+              <Anchor className="w-3.5 h-3.5 text-amber-400" />
+              <span>VS</span>
+              <Anchor className="w-3.5 h-3.5 text-amber-400" />
+            </div>
+          </div>
+
+          {/* Team Blue Status */}
+          <div className="flex flex-col items-center text-center">
+            <span className="text-[11px] font-black uppercase text-blue-400 flex items-center gap-1.5">
+              TEAM BLUE
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-ping" />
+            </span>
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-300 mt-0.5">
+              {blueSelected !== null ? '✓ Locked' : 'Answering...'}
+            </span>
+          </div>
+
+        </div>
+
+        {/* ======================================================== */}
+        {/* 3. TEAM BLUE QUESTION CARD */}
+        {/* ======================================================== */}
+        <div className={`flex-1 order-3 relative rounded-2xl p-4 sm:p-5 flex flex-col justify-between border-4 transition-all shadow-2xl bg-gradient-to-b from-blue-950 via-slate-950 to-slate-900 ${
           blueSelected !== null && !isEvaluating ? 'border-amber-400 ring-2 ring-amber-400/50' : 'border-blue-500/80'
         }`}>
           
