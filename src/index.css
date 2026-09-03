@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-shadow-nautical {
+    text-shadow: 0 4px 0 #0369a1, 0 6px 12px rgba(8, 47, 73, 0.4);
+  }
+  .text-shadow-gold {
+    text-shadow: 0 4px 0 #ca8a04, 0 6px 12px rgba(133, 77, 14, 0.4);
+  }
+  .text-shadow-red {
+    text-shadow: 0 3px 0 #991b1b, 0 4px 8px rgba(153, 27, 27, 0.4);
+  }
+  .text-shadow-blue {
+    text-shadow: 0 3px 0 #1e40af, 0 4px 8px rgba(30, 64, 175, 0.4);
+  }
+  .text-stroke-thick {
+    -webkit-text-stroke: 4px #0c4a6e;
+    paint-order: stroke fill;
+  }
+  .text-stroke-gold {
+    -webkit-text-stroke: 3px #854d0e;
+    paint-order: stroke fill;
+  }
+}
+
+/* Water ripples and wave animations */
+@keyframes waveSlow {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes waveFast {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-waves-1 {
+  animation: waveSlow 14s linear infinite;
+}
+
+.animate-waves-2 {
+  animation: waveFast 9s linear infinite;
+}
+
+/* Respect user's motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom crisp nautical scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #e0f2fe;
+}
+::-webkit-scrollbar-thumb {
+  background: #0284c7;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0369a1;
+}
