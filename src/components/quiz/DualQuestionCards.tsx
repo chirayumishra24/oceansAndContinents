@@ -145,8 +145,8 @@ export const DualQuestionCards: React.FC<DualQuestionCardsProps> = ({
             </div>
           </div>
 
-          {/* Options Grid */}
-          <div className="grid grid-cols-1 gap-2 my-2">
+          {/* Options Grid (2x2 Layout: 2 rows, 2 columns) */}
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 my-2">
             {redQuestion.options.map((opt, idx) => {
               const isSelected = redSelected === idx;
               const isCorrect = isEvaluating ? idx === redQuestion.correctAnswer : null;
@@ -236,8 +236,8 @@ export const DualQuestionCards: React.FC<DualQuestionCardsProps> = ({
             </div>
           </div>
 
-          {/* Options Grid */}
-          <div className="grid grid-cols-1 gap-2 my-2">
+          {/* Options Grid (2x2 Layout: 2 rows, 2 columns) */}
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 my-2">
             {blueQuestion.options.map((opt, idx) => {
               const isSelected = blueSelected === idx;
               const isCorrect = isEvaluating ? idx === blueQuestion.correctAnswer : null;
