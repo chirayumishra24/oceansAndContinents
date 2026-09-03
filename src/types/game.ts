@@ -4,6 +4,7 @@ export type Category =
   | 'Oceans' 
   | 'Continents' 
   | 'Countries & Continents' 
+  | 'Countries and Continents'
   | 'World Geography' 
   | 'Geographic Features' 
   | 'Ocean Facts';

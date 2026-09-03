@@ -91,10 +91,10 @@ export const DualQuestionCards: React.FC<DualQuestionCardsProps> = ({
         <div className="flex items-center gap-4">
           <div className="text-center">
             <span className="text-[10px] font-bold text-sky-300 uppercase tracking-wider block">
-              SIMULTANEOUS ROUND
+              ROUND
             </span>
             <span className="text-base sm:text-xl font-black font-display text-amber-300">
-              {roundNumber} / {totalRounds}
+              {roundNumber}
             </span>
           </div>
 

@@ -619,6 +619,406 @@ export const QUESTIONS_BANK: Question[] = [
     category: 'Geographic Features',
     type: 'multiple-choice',
     explanation: 'The Arctic Tundra features permafrost and low-growing vegetation adapted to extreme cold.'
+  },
+  {
+    id: 'feat-09',
+    question: 'Which narrow body of water separates the continents of Asia and North America?',
+    options: ['Bering Strait', 'Strait of Gibraltar', 'Strait of Malacca', 'Cook Strait'],
+    correctAnswer: 0,
+    difficulty: 'easy',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'The Bering Strait connects the Arctic Ocean with the Bering Sea and separates Russia from Alaska.'
+  },
+  {
+    id: 'feat-10',
+    question: 'What is the longest river in Asia and third-longest in the world?',
+    options: ['Yellow River', 'Yangtze River', 'Mekong River', 'Indus River'],
+    correctAnswer: 1,
+    difficulty: 'medium',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'The Yangtze River in China spans approximately 6,300 km (3,915 mi).'
+  },
+  {
+    id: 'feat-11',
+    question: 'The historic Suez Canal connects the Mediterranean Sea to which body of water?',
+    options: ['Red Sea', 'Black Sea', 'Persian Gulf', 'Arabian Sea'],
+    correctAnswer: 0,
+    difficulty: 'medium',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'Opened in 1869, the Suez Canal in Egypt connects the Mediterranean Sea directly to the Red Sea.'
+  },
+  {
+    id: 'feat-12',
+    question: 'Which famous artificial waterway connects the Atlantic and Pacific Oceans?',
+    options: ['Kiel Canal', 'Suez Canal', 'Panama Canal', 'Erie Canal'],
+    correctAnswer: 2,
+    difficulty: 'easy',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'The Panama Canal cuts across the Isthmus of Panama to connect the Atlantic and Pacific Oceans.'
+  },
+  {
+    id: 'feat-13',
+    question: 'Which major sea is located between Southern Europe and Northern Africa?',
+    options: ['Baltic Sea', 'Mediterranean Sea', 'North Sea', 'Coral Sea'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'The Mediterranean Sea is an almost completely enclosed sea bordered by Europe, Africa, and Asia.'
+  },
+  {
+    id: 'feat-14',
+    question: 'What is the highest mountain peak on the African continent?',
+    options: ['Mount Kenya', 'Mount Kilimanjaro', 'Mount Stanley', 'Atlas Peak'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'Mount Kilimanjaro in Tanzania rises to 5,895 meters (19,341 feet) above sea level.'
+  },
+  {
+    id: 'feat-15',
+    question: 'Which desert covers most of Northern Africa and is the largest hot desert on Earth?',
+    options: ['Kalahari Desert', 'Namib Desert', 'Sahara Desert', 'Mojave Desert'],
+    correctAnswer: 2,
+    difficulty: 'easy',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'The Sahara Desert spans across 11 North African countries, covering about 9.2 million km².'
+  },
+  {
+    id: 'feat-16',
+    question: 'Which lake in Siberia, Russia is the deepest and oldest freshwater lake in the world?',
+    options: ['Lake Baikal', 'Lake Superior', 'Lake Victoria', 'Lake Michigan'],
+    correctAnswer: 0,
+    difficulty: 'medium',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'Lake Baikal holds about 20% of the world’s unfrozen freshwater and reaches a depth of 1,642 meters.'
+  },
+  {
+    id: 'feat-17',
+    question: 'The iconic symmetrical volcanic mountain Mount Fuji is located in which island nation?',
+    options: ['South Korea', 'Japan', 'Philippines', 'Indonesia'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'Mount Fuji is an active stratovolcano and the highest peak in Japan on Honshu island.'
+  },
+  {
+    id: 'feat-18',
+    question: 'Which strait separates Spain in Europe from Morocco in Africa?',
+    options: ['Strait of Hormuz', 'Strait of Gibraltar', 'Bosporus Strait', 'Dardanelles'],
+    correctAnswer: 1,
+    difficulty: 'medium',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'The Strait of Gibraltar connects the Atlantic Ocean to the Mediterranean Sea and is only 14 km wide at its narrowest.'
+  },
+  {
+    id: 'feat-19',
+    question: 'The breathtaking Victoria Falls is situated on which great African river?',
+    options: ['Nile River', 'Congo River', 'Zambezi River', 'Niger River'],
+    correctAnswer: 2,
+    difficulty: 'hard',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'Victoria Falls is on the Zambezi River along the border of Zambia and Zimbabwe.'
+  },
+  {
+    id: 'feat-20',
+    question: 'Which large cold desert spans parts of Northern China and Southern Mongolia?',
+    options: ['Atacama Desert', 'Gobi Desert', 'Arabian Desert', 'Sonoran Desert'],
+    correctAnswer: 1,
+    difficulty: 'medium',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'The Gobi Desert is known for its extreme continental climate and rich fossil deposits.'
+  },
+  {
+    id: 'feat-21',
+    question: 'Which famous river flows right through the capital city of London in the United Kingdom?',
+    options: ['River Seine', 'River Danube', 'River Thames', 'River Rhine'],
+    correctAnswer: 2,
+    difficulty: 'easy',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'The River Thames flows 346 km through southern England, including Greater London.'
+  },
+  {
+    id: 'feat-22',
+    question: 'Which coastal strip in Chile is recognized as the driest non-polar desert on Earth?',
+    options: ['Atacama Desert', 'Patagonian Desert', 'Mojave Desert', 'Kalahari Desert'],
+    correctAnswer: 0,
+    difficulty: 'medium',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'Some weather stations in the Atacama Desert have never recorded a single drop of rainfall.'
+  },
+  {
+    id: 'feat-23',
+    question: 'The Ural Mountains form the traditional natural boundary between which two continents?',
+    options: ['Europe and Asia', 'Asia and Africa', 'North and South America', 'Europe and Africa'],
+    correctAnswer: 0,
+    difficulty: 'easy',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'The Ural Mountains run north-south through western Russia, dividing Europe and Asia.'
+  },
+  {
+    id: 'feat-24',
+    question: 'Which body of water is situated between Iran and the Arabian Peninsula?',
+    options: ['Red Sea', 'Persian Gulf', 'Bay of Bengal', 'Caspian Sea'],
+    correctAnswer: 1,
+    difficulty: 'medium',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'The Persian Gulf is a Mediterranean sea in Western Asia and a vital world trade waterway.'
+  },
+  {
+    id: 'feat-25',
+    question: 'The Great Rift Valley is a massive geological trench running down which continent?',
+    options: ['Asia', 'Africa', 'South America', 'Australia'],
+    correctAnswer: 1,
+    difficulty: 'medium',
+    category: 'Geographic Features',
+    type: 'multiple-choice',
+    explanation: 'The East African Rift Valley is where the African tectonic plate is actively splitting into two.'
+  },
+  {
+    id: 'ocean-16',
+    question: 'Which unique sea has no land boundaries and is defined solely by ocean currents in the Atlantic?',
+    options: ['Sargasso Sea', 'Baltic Sea', 'Adriatic Sea', 'Tasman Sea'],
+    correctAnswer: 0,
+    difficulty: 'hard',
+    category: 'Oceans',
+    type: 'multiple-choice',
+    explanation: 'The Sargasso Sea is bounded by four ocean currents forming the North Atlantic Gyre.'
+  },
+  {
+    id: 'ocean-17',
+    question: 'The Great Barrier Reef, the largest coral reef system on Earth, is located in which sea?',
+    options: ['Tasman Sea', 'Coral Sea', 'South China Sea', 'Arabian Sea'],
+    correctAnswer: 1,
+    difficulty: 'medium',
+    category: 'Oceans',
+    type: 'multiple-choice',
+    explanation: 'The Coral Sea lies off the northeast coast of Queensland, Australia.'
+  },
+  {
+    id: 'ocean-18',
+    question: 'Which ocean is recognized as having the warmest average surface water temperatures?',
+    options: ['Indian Ocean', 'Arctic Ocean', 'Atlantic Ocean', 'Southern Ocean'],
+    correctAnswer: 0,
+    difficulty: 'medium',
+    category: 'Oceans',
+    type: 'multiple-choice',
+    explanation: 'The Indian Ocean’s tropical location gives it the warmest surface temperatures among Earth’s major oceans.'
+  },
+  {
+    id: 'ocean-19',
+    question: 'Which narrow strait separates the island of Great Britain from mainland France?',
+    options: ['Strait of Dover (English Channel)', 'Bering Strait', 'Cook Strait', 'Strait of Messina'],
+    correctAnswer: 0,
+    difficulty: 'easy',
+    category: 'Oceans',
+    type: 'multiple-choice',
+    explanation: 'The Strait of Dover connects the English Channel with the North Sea.'
+  },
+  {
+    id: 'ocean-20',
+    question: 'Which ocean holds more than half of all the free water on planet Earth?',
+    options: ['Atlantic Ocean', 'Pacific Ocean', 'Indian Ocean', 'Southern Ocean'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'Oceans',
+    type: 'multiple-choice',
+    explanation: 'The immense Pacific Ocean contains more water than all other oceans combined.'
+  },
+  {
+    id: 'cont-16',
+    question: 'Which is the only continent on Earth that has zero active volcanoes?',
+    options: ['Europe', 'Australia', 'South America', 'Africa'],
+    correctAnswer: 1,
+    difficulty: 'hard',
+    category: 'Continents',
+    type: 'multiple-choice',
+    explanation: 'Australia sits securely in the middle of the Indo-Australian tectonic plate with no active volcanic activity on its mainland.'
+  },
+  {
+    id: 'cont-17',
+    question: 'Which continent has the highest average elevation of any continent on Earth?',
+    options: ['Asia', 'Antarctica', 'South America', 'North America'],
+    correctAnswer: 1,
+    difficulty: 'hard',
+    category: 'Continents',
+    type: 'multiple-choice',
+    explanation: 'Because of its massive 2-kilometer thick ice sheet, Antarctica has an average elevation of 2,300 meters above sea level.'
+  },
+  {
+    id: 'cont-18',
+    question: 'Which continent has the greatest number of individual sovereign countries (54 nations)?',
+    options: ['Asia', 'Africa', 'Europe', 'North America'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'Continents',
+    type: 'multiple-choice',
+    explanation: 'Africa contains 54 fully recognized UN member states, more than any other continent.'
+  },
+  {
+    id: 'cont-19',
+    question: 'Which continent is also entirely governed as a single country?',
+    options: ['Australia', 'Antarctica', 'South America', 'Europe'],
+    correctAnswer: 0,
+    difficulty: 'easy',
+    category: 'Continents',
+    type: 'multiple-choice',
+    explanation: 'The Commonwealth of Australia encompasses the entire mainland continent of Australia.'
+  },
+  {
+    id: 'cont-20',
+    question: 'Which continent contains the Amazon Rainforest, the largest tropical rainforest on Earth?',
+    options: ['Africa', 'Asia', 'South America', 'North America'],
+    correctAnswer: 2,
+    difficulty: 'easy',
+    category: 'Continents',
+    type: 'multiple-choice',
+    explanation: 'The Amazon Basin spans across nine South American nations, primarily Brazil.'
+  },
+  {
+    id: 'cntry-11',
+    question: 'In which continent is the nation of Argentina located?',
+    options: ['Europe', 'South America', 'North America', 'Africa'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'Countries and Continents',
+    type: 'multiple-choice',
+    explanation: 'Argentina is the second-largest country in South America, known for the Pampas and Andes mountains.'
+  },
+  {
+    id: 'cntry-12',
+    question: 'In which continent is the country of Kenya located?',
+    options: ['Asia', 'Africa', 'South America', 'Europe'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'Countries and Continents',
+    type: 'multiple-choice',
+    explanation: 'Kenya is located in East Africa, with its coastline on the Indian Ocean.'
+  },
+  {
+    id: 'cntry-13',
+    question: 'In which continent is the country of Germany located?',
+    options: ['Europe', 'Asia', 'North America', 'Australia'],
+    correctAnswer: 0,
+    difficulty: 'easy',
+    category: 'Countries and Continents',
+    type: 'multiple-choice',
+    explanation: 'Germany is a major nation located in Central Europe.'
+  },
+  {
+    id: 'cntry-14',
+    question: 'In which continent is Thailand located?',
+    options: ['Africa', 'Asia', 'South America', 'Oceania'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'Countries and Continents',
+    type: 'multiple-choice',
+    explanation: 'Thailand is situated in Southeast Asia on the Indochinese Peninsula.'
+  },
+  {
+    id: 'cntry-15',
+    question: 'In which continent is Canada located?',
+    options: ['Europe', 'North America', 'South America', 'Asia'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'Countries and Continents',
+    type: 'multiple-choice',
+    explanation: 'Canada occupies the northern portion of the North American continent.'
+  },
+  {
+    id: 'cntry-16',
+    question: 'In which continent is the historic nation of Egypt primarily located?',
+    options: ['Africa', 'Asia', 'Europe', 'South America'],
+    correctAnswer: 0,
+    difficulty: 'easy',
+    category: 'Countries and Continents',
+    type: 'multiple-choice',
+    explanation: 'Egypt is located in Northeast Africa (with the Sinai Peninsula extending into Western Asia).'
+  },
+  {
+    id: 'cntry-17',
+    question: 'New Zealand is an island nation situated within which geographic region/continent?',
+    options: ['Oceania', 'Asia', 'South America', 'Africa'],
+    correctAnswer: 0,
+    difficulty: 'easy',
+    category: 'Countries and Continents',
+    type: 'multiple-choice',
+    explanation: 'New Zealand consists of two main islands (North and South Island) in the southwestern Pacific Ocean in Oceania.'
+  },
+  {
+    id: 'cntry-18',
+    question: 'In which continent is Norway located?',
+    options: ['North America', 'Europe', 'Asia', 'Antarctica'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'Countries and Continents',
+    type: 'multiple-choice',
+    explanation: 'Norway occupies the western portion of the Scandinavian Peninsula in Northern Europe.'
+  },
+  {
+    id: 'cntry-19',
+    question: 'In which continent is Peru, home of the ancient city Machu Picchu, located?',
+    options: ['South America', 'North America', 'Africa', 'Europe'],
+    correctAnswer: 0,
+    difficulty: 'easy',
+    category: 'Countries and Continents',
+    type: 'multiple-choice',
+    explanation: 'Peru is located in western South America along the Pacific Ocean and Andes Mountains.'
+  },
+  {
+    id: 'cntry-20',
+    question: 'In which continent is India located?',
+    options: ['Africa', 'Asia', 'Europe', 'Australia'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'Countries and Continents',
+    type: 'multiple-choice',
+    explanation: 'India is located in South Asia and is bounded by the Indian Ocean on the south.'
+  },
+  {
+    id: 'geo-11',
+    question: 'What is the imaginary line of 0° Longitude that passes through Greenwich, England called?',
+    options: ['Equator', 'Prime Meridian', 'International Date Line', 'Tropic of Cancer'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'World Geography',
+    type: 'multiple-choice',
+    explanation: 'The Prime Meridian divides Earth into the Eastern and Western Hemispheres at 0° longitude.'
+  },
+  {
+    id: 'geo-12',
+    question: 'What is the geographic term for a narrow strip of land connecting two larger land masses?',
+    options: ['Peninsula', 'Isthmus', 'Archipelago', 'Strait'],
+    correctAnswer: 1,
+    difficulty: 'medium',
+    category: 'World Geography',
+    type: 'multiple-choice',
+    explanation: 'An isthmus (like the Isthmus of Panama) connects two larger land areas with water on both sides.'
+  },
+  {
+    id: 'geo-13',
+    question: 'What do we call a piece of land almost completely surrounded by water on three sides?',
+    options: ['Island', 'Peninsula', 'Plateau', 'Atoll'],
+    correctAnswer: 1,
+    difficulty: 'easy',
+    category: 'World Geography',
+    type: 'multiple-choice',
+    explanation: 'A peninsula (such as the Florida, Iberian, or Arabian Peninsula) projects into a body of water.'
   }
 ];
 

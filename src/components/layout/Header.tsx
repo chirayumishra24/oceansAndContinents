@@ -40,10 +40,10 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center justify-center">
         <div className="px-3 sm:px-5 py-1 sm:py-1.5 rounded-full bg-slate-900/80 border-2 border-sky-400/60 shadow-inner flex items-center gap-2">
           <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-sky-300">
-            QUESTION
+            ROUND
           </span>
           <span className="text-sm sm:text-lg font-black text-amber-300 font-display">
-            {questionNumber} <span className="text-slate-400 font-normal">/ {maxQuestions}</span>
+            {questionNumber}
           </span>
         </div>
       </div>

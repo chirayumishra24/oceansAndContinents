@@ -34,9 +34,12 @@ export class QuestionManager {
    * Draw the next random question without repetition
    */
   public getNextQuestion(): Question | null {
-    const available = this.getAvailableQuestions();
+    let available = this.getAvailableQuestions();
     if (available.length === 0) {
-      return null;
+      // If entire question bank has been depleted in an ultra-long race, refresh pool
+      this.usedIds.clear();
+      available = this.getAvailableQuestions();
+      if (available.length === 0) return null;
     }
     const randomIndex = Math.floor(Math.random() * available.length);
     const selected = available[randomIndex];

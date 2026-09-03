@@ -227,8 +227,8 @@ export function useGame() {
       blueCorrect: prev.blueCorrect + (isBlueCorrect ? 1 : 0),
     }));
 
-    // Check if someone reached the finish line or completed 10 rounds
-    const isGameFinished = (newRedPos >= MAX_CHECKPOINTS) || (newBluePos >= MAX_CHECKPOINTS) || (roundNumber >= TOTAL_ROUNDS);
+    // Check if someone reached the finish line (at least 1 team reaches MAX_CHECKPOINTS)
+    const isGameFinished = (newRedPos >= MAX_CHECKPOINTS) || (newBluePos >= MAX_CHECKPOINTS);
 
     if (isGameFinished) {
       evaluateTimeoutRef.current = setTimeout(() => {
