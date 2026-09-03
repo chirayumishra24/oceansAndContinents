@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Ship } from '../race/Ship';
-import { Play, Volume2, VolumeX, Compass, Anchor } from 'lucide-react';
-import { InstructionsCard } from '../layout/InstructionsCard';
+import { Play, Volume2, VolumeX, Compass, Anchor, Maximize, Minimize } from 'lucide-react';
 
 interface StartScreenProps {
   onStart: () => void;
@@ -15,6 +14,24 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   soundEnabled,
   onToggleSound,
 }) => {
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.().catch(() => {});
+    }
+  };
+
   return (
     <div className="relative min-h-screen w-full flex flex-col justify-between overflow-x-hidden bg-gradient-to-b from-sky-400 via-sky-300 to-ocean-dark select-none p-3 sm:p-6">
       
@@ -60,6 +77,17 @@ export const StartScreen: React.FC<StartScreenProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Fullscreen Toggle */}
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            className="p-2.5 rounded-full border-2 shadow-md bg-sky-900/80 hover:bg-sky-800 text-sky-200 hover:text-white border-sky-600 transition-all hover:scale-105"
+            title={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+            aria-label={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+          >
+            {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+          </button>
+
           <button
             type="button"
             onClick={onToggleSound}

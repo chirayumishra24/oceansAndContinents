@@ -1,5 +1,5 @@
-import React from 'react';
-import { Volume2, VolumeX, Home, HelpCircle, Anchor } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Volume2, VolumeX, Home, HelpCircle, Anchor, Maximize, Minimize } from 'lucide-react';
 
 interface HeaderProps {
   questionNumber: number;
@@ -12,12 +12,29 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   questionNumber,
-  maxQuestions = 20,
   soundEnabled,
   onToggleSound,
   onHome,
   onOpenInstructions,
 }) => {
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.().catch(() => {});
+    }
+  };
+
   return (
     <header className="w-full flex items-center justify-between gap-2 sm:gap-4 py-2 px-3 sm:px-6 bg-gradient-to-r from-ocean-deep via-ocean-dark to-ocean-abyss border-b-4 border-amber-500/80 shadow-lg select-none text-white">
       
@@ -48,8 +65,23 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Right Controls: Instructions, Sound Toggle, Home */}
+      {/* Right Controls: Fullscreen, Instructions, Sound Toggle, Home */}
       <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* Fullscreen Toggle */}
+        <button
+          type="button"
+          onClick={toggleFullscreen}
+          title={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+          aria-label={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+          className="p-2 sm:p-2.5 rounded-full bg-sky-800/80 hover:bg-sky-700 text-sky-100 hover:text-white border border-sky-600 transition-colors shadow focus:outline-none focus:ring-2 focus:ring-amber-300"
+        >
+          {isFullscreen ? (
+            <Minimize className="w-4 h-4 sm:w-5 sm:h-5" />
+          ) : (
+            <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
+          )}
+        </button>
+
         {/* Help / Instructions Modal Trigger */}
         <button
           type="button"
