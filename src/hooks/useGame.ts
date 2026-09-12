@@ -11,6 +11,7 @@ import {
 import { QuestionManager } from '../utils/questionManager';
 import { soundManager } from '../utils/soundManager';
 import { triggerVictoryConfetti, triggerMilestoneBurst } from '../utils/confetti';
+import { loadCustomQuestions } from '../utils/questionStorage';
 
 export const MAX_CHECKPOINTS = 10;
 export const TOTAL_ROUNDS = 10;
@@ -28,8 +29,11 @@ export function useGame() {
   const [screen, setScreen] = useState<ScreenState>('start');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
-  // Question bank manager
-  const [qm] = useState<QuestionManager>(() => new QuestionManager());
+  // Question bank manager — load custom questions from localStorage if available
+  const [qm] = useState<QuestionManager>(() => {
+    const custom = loadCustomQuestions();
+    return custom ? new QuestionManager(custom) : new QuestionManager();
+  });
 
   // Round tracking (1 to 10)
   const [roundNumber, setRoundNumber] = useState<number>(1);

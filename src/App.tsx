@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { useGame } from './hooks/useGame';
 import { StartScreen } from './components/screens/StartScreen';
 import { RaceScreen } from './components/screens/RaceScreen';
 import { VictoryScreen } from './components/screens/VictoryScreen';
 import { InstructionsModal } from './components/screens/InstructionsModal';
+import { TeacherPanel } from './components/teacher/TeacherPanel';
 
-export const App: React.FC = () => {
+const GameScreen: React.FC = () => {
   const game = useGame();
   const [isInstructionsOpen, setIsInstructionsOpen] = useState<boolean>(false);
 
@@ -47,6 +49,15 @@ export const App: React.FC = () => {
         }}
       />
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<GameScreen />} />
+      <Route path="/teacher" element={<TeacherPanel />} />
+    </Routes>
   );
 };
 
