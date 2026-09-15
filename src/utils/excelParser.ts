@@ -239,3 +239,142 @@ export function generateTemplateExcel(): void {
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Questions');
   XLSX.writeFile(workbook, 'question_template.xlsx');
 }
+
+export function parseJsonQuestions(jsonContent: string): ParseResult {
+  try {
+    const raw = JSON.parse(jsonContent);
+    const rawArray = Array.isArray(raw)
+      ? raw
+      : (raw && Array.isArray(raw.questions) ? raw.questions : null);
+
+    if (!rawArray || rawArray.length === 0) {
+      return {
+        questions: [],
+        errors: [{ row: 0, column: '', message: 'JSON file must contain an array of question objects.' }],
+        warnings: [],
+        totalRows: 0,
+      };
+    }
+
+    const questions: Question[] = [];
+    const errors: ParseError[] = [];
+    const warnings: string[] = [];
+
+    rawArray.forEach((item: any, index: number) => {
+      const rowNum = index + 1;
+      if (!item || typeof item !== 'object') {
+        errors.push({ row: rowNum, column: '', message: 'Item is not a valid question object.' });
+        return;
+      }
+
+      const qText = typeof item.question === 'string' ? item.question.trim() : '';
+      if (!qText) {
+        errors.push({ row: rowNum, column: 'question', message: 'Missing question text.' });
+        return;
+      }
+
+      let options: string[] = [];
+      if (Array.isArray(item.options)) {
+        options = item.options.map((opt: any) => String(opt).trim()).filter(Boolean);
+      } else if (item.optionA && item.optionB) {
+        options = [item.optionA, item.optionB, item.optionC, item.optionD]
+          .filter(Boolean)
+          .map((opt: any) => String(opt).trim());
+      }
+
+      if (options.length < 2) {
+        errors.push({ row: rowNum, column: 'options', message: `Need at least 2 options, found ${options.length}.` });
+        return;
+      }
+
+      let correctAnswerIndex: number | null = null;
+      if (typeof item.correctAnswer === 'number' && item.correctAnswer >= 0 && item.correctAnswer < options.length) {
+        correctAnswerIndex = item.correctAnswer;
+      } else if (typeof item.correctAnswer === 'string') {
+        correctAnswerIndex = mapCorrectAnswer(item.correctAnswer, options.length);
+      }
+
+      if (correctAnswerIndex === null) {
+        errors.push({
+          row: rowNum,
+          column: 'correctAnswer',
+          message: `Invalid correct answer "${item.correctAnswer}". Must be 0-${options.length - 1} or A-${String.fromCharCode(65 + options.length - 1)}.`,
+        });
+        return;
+      }
+
+      const diff = (typeof item.difficulty === 'string' ? item.difficulty.toLowerCase().trim() : 'medium') as Difficulty;
+      const validDiff: Difficulty = (diff === 'easy' || diff === 'medium' || diff === 'hard') ? diff : 'medium';
+      const cat = (typeof item.category === 'string' && item.category.trim()) ? item.category.trim() as Category : inferCategory(qText);
+
+      questions.push({
+        id: item.id || `custom-q-${Date.now()}-${index}`,
+        question: qText,
+        options,
+        correctAnswer: correctAnswerIndex,
+        difficulty: validDiff,
+        category: cat,
+        explanation: typeof item.explanation === 'string' ? item.explanation.trim() : '',
+        type: item.type || inferQuestionType(options),
+      });
+    });
+
+    return {
+      questions,
+      errors,
+      warnings,
+      totalRows: rawArray.length,
+    };
+  } catch (err) {
+    return {
+      questions: [],
+      errors: [{ row: 0, column: '', message: `Invalid JSON syntax: ${(err as Error).message}` }],
+      warnings: [],
+      totalRows: 0,
+    };
+  }
+}
+
+export async function parseQuestionsFile(file: File): Promise<ParseResult> {
+  const isJson = file.name.toLowerCase().endsWith('.json') || file.type === 'application/json';
+  if (isJson) {
+    const text = await file.text();
+    return parseJsonQuestions(text);
+  }
+  return parseExcelFile(file);
+}
+
+export function generateTemplateJson(): void {
+  const templateQuestions = [
+    {
+      id: 'template-01',
+      question: 'Which is the largest ocean on Earth?',
+      options: ['Pacific Ocean', 'Atlantic Ocean', 'Indian Ocean', 'Arctic Ocean'],
+      correctAnswer: 0,
+      difficulty: 'easy',
+      category: 'Oceans',
+      explanation: 'The Pacific Ocean covers over 30% of Earth\'s surface.',
+      type: 'multiple-choice'
+    },
+    {
+      id: 'template-02',
+      question: 'True or False: Africa is the largest continent.',
+      options: ['True', 'False'],
+      correctAnswer: 1,
+      difficulty: 'easy',
+      category: 'Continents',
+      explanation: 'Asia is the largest continent, not Africa.',
+      type: 'true-false'
+    }
+  ];
+  const blob = new Blob([JSON.stringify(templateQuestions, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'question_template.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+

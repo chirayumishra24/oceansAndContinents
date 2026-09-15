@@ -67,6 +67,14 @@ export class QuestionManager {
   public hasBeenUsed(id: string): boolean {
     return this.usedIds.has(id);
   }
+
+  /**
+   * Dynamically replace questions pool (e.g. from cloud database)
+   */
+  public setQuestions(newQuestions: Question[]): void {
+    this.questions = [...newQuestions];
+    this.reset();
+  }
 }
 
 export const defaultQuestionManager = new QuestionManager();

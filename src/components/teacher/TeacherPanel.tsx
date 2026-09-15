@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Question } from '../../types/game';
-import { parseExcelFile, generateTemplateExcel, ParseResult } from '../../utils/excelParser';
-import { saveCustomQuestions, loadCustomQuestions, clearCustomQuestions, hasCustomQuestions } from '../../utils/questionStorage';
+import { parseQuestionsFile, generateTemplateExcel, generateTemplateJson, ParseResult } from '../../utils/excelParser';
+import { 
+  saveCustomQuestionsToCloud, 
+  clearCustomQuestionsFromCloud, 
+  syncQuestionsFromCloud, 
+  loadCustomQuestions, 
+  exportQuestionsToJson 
+} from '../../utils/questionStorage';
+import { subscribeToCloudQuestions } from '../../services/firebaseQuestions';
+import { QUESTIONS_BANK } from '../../data/questions';
 import { UploadZone } from './UploadZone';
 import { QuestionPreview } from './QuestionPreview';
 import {
@@ -15,26 +23,53 @@ import {
   Sparkles,
   FileSpreadsheet,
   ShieldCheck,
+  Cloud,
+  Loader2,
 } from 'lucide-react';
 
 export const TeacherPanel: React.FC = () => {
   const navigate = useNavigate();
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSavingCloud, setIsSavingCloud] = useState(false);
+  const [cloudStatus, setCloudStatus] = useState<'checking' | 'connected' | 'offline'>('checking');
   const [savedQuestions, setSavedQuestions] = useState<Question[] | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
 
   useEffect(() => {
-    const existing = loadCustomQuestions();
-    if (existing) setSavedQuestions(existing);
+    // Initial sync from local storage then cloud
+    const local = loadCustomQuestions();
+    if (local) setSavedQuestions(local);
+
+    syncQuestionsFromCloud()
+      .then((questions) => {
+        if (questions) setSavedQuestions(questions);
+        setCloudStatus('connected');
+      })
+      .catch((err) => {
+        console.warn('Initial cloud sync warning:', err);
+        setCloudStatus('offline');
+      });
+
+    // Real-time subscription across tabs and devices
+    const unsubscribe = subscribeToCloudQuestions((questions) => {
+      if (questions && questions.length > 0) {
+        setSavedQuestions(questions);
+      } else {
+        setSavedQuestions(null);
+      }
+      setCloudStatus('connected');
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const handleFileSelected = async (file: File) => {
     setIsLoading(true);
     setFileName(file.name);
     try {
-      const result = await parseExcelFile(file);
+      const result = await parseQuestionsFile(file);
       setParseResult(result);
     } catch (err) {
       setParseResult({
@@ -48,22 +83,36 @@ export const TeacherPanel: React.FC = () => {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!parseResult || parseResult.questions.length === 0) return;
-    saveCustomQuestions(parseResult.questions);
-    setSavedQuestions(parseResult.questions);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
+    setIsSavingCloud(true);
+    try {
+      await saveCustomQuestionsToCloud(parseResult.questions);
+      setSavedQuestions(parseResult.questions);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 4000);
+    } catch (err) {
+      console.error('Failed to save questions to cloud:', err);
+    } finally {
+      setIsSavingCloud(false);
+    }
   };
 
-  const handleClear = () => {
-    clearCustomQuestions();
-    setSavedQuestions(null);
-    setParseResult(null);
-    setFileName(null);
+  const handleClear = async () => {
+    setIsSavingCloud(true);
+    try {
+      await clearCustomQuestionsFromCloud();
+      setSavedQuestions(null);
+      setParseResult(null);
+      setFileName(null);
+    } catch (err) {
+      console.error('Failed to clear custom questions:', err);
+    } finally {
+      setIsSavingCloud(false);
+    }
   };
 
-  const canSave = parseResult && parseResult.questions.length > 0;
+  const canSave = parseResult && parseResult.questions.length > 0 && !isSavingCloud;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white">
@@ -88,9 +137,21 @@ export const TeacherPanel: React.FC = () => {
 
         {/* Title Section */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-4">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            Teacher Dashboard
+          <div className="flex items-center justify-center gap-2.5 mb-4 flex-wrap">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Teacher Dashboard
+            </div>
+            <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-medium transition-all ${
+              cloudStatus === 'connected'
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                : cloudStatus === 'checking'
+                ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                : 'bg-slate-800 border-slate-700 text-slate-400'
+            }`}>
+              <Cloud className="w-3.5 h-3.5" />
+              {cloudStatus === 'connected' ? 'Firebase Cloud Synced' : cloudStatus === 'checking' ? 'Connecting to Cloud...' : 'Offline Mode'}
+            </div>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-3">
             <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -98,7 +159,7 @@ export const TeacherPanel: React.FC = () => {
             </span>
           </h1>
           <p className="text-slate-400 max-w-xl mx-auto">
-            Upload an Excel sheet to dynamically change game questions. Students will play with your custom questions.
+            Upload an Excel or JSON sheet to update game questions across all platforms and student devices in real time.
           </p>
         </div>
 
@@ -122,31 +183,49 @@ export const TeacherPanel: React.FC = () => {
                 {savedQuestions ? <Sparkles className="w-5 h-5" /> : <BookOpen className="w-5 h-5" />}
               </div>
               <div>
-                <p className="font-semibold text-sm">
+                <p className="font-semibold text-sm flex items-center gap-2">
                   {savedQuestions
                     ? `Custom Questions Active (${savedQuestions.length} questions)`
                     : 'Using Default Question Bank'
                   }
+                  {savedQuestions && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      Cloud Synced
+                    </span>
+                  )}
                 </p>
                 <p className="text-slate-500 text-xs mt-0.5">
                   {savedQuestions
-                    ? 'The game will use your uploaded questions'
-                    : 'Upload an Excel sheet to replace the default questions'
+                    ? 'Synced to Firebase Firestore — all student devices and screens load these questions'
+                    : 'Upload questions below to replace defaults and sync across all classroom screens & devices'
                   }
                 </p>
               </div>
             </div>
 
-            {savedQuestions && (
+            <div className="flex items-center gap-3">
               <button
-                onClick={handleClear}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/10 text-red-400 
-                           border border-red-500/20 hover:bg-red-500/20 transition-all text-sm font-medium"
+                onClick={() => exportQuestionsToJson(savedQuestions || QUESTIONS_BANK, savedQuestions ? 'custom_questions.json' : 'default_questions.json')}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/80 text-cyan-300 
+                           border border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-400 transition-all text-sm font-medium"
+                title="Download current active question bank as a JSON file"
               >
-                <Trash2 className="w-4 h-4" />
-                Clear & Use Defaults
+                <Download className="w-4 h-4" />
+                Export Active Bank (JSON)
               </button>
-            )}
+
+              {savedQuestions && (
+                <button
+                  onClick={handleClear}
+                  disabled={isSavingCloud}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/10 text-red-400 
+                             border border-red-500/20 hover:bg-red-500/20 transition-all text-sm font-medium disabled:opacity-50"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  {isSavingCloud ? 'Resetting...' : 'Reset to Defaults'}
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -157,14 +236,24 @@ export const TeacherPanel: React.FC = () => {
               <FileSpreadsheet className="w-5 h-5 text-cyan-400" />
               Upload Questions
             </h2>
-            <button
-              onClick={generateTemplateExcel}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 text-slate-300 
-                         border border-slate-600/50 hover:bg-slate-700 hover:text-white transition-all text-sm font-medium"
-            >
-              <Download className="w-4 h-4" />
-              Download Template
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={generateTemplateExcel}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 
+                           border border-slate-600/50 hover:bg-slate-700 hover:text-white transition-all text-xs font-medium"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Excel Template
+              </button>
+              <button
+                onClick={generateTemplateJson}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 text-cyan-300 
+                           border border-cyan-600/30 hover:bg-slate-700 hover:text-white transition-all text-xs font-medium"
+              >
+                <Download className="w-3.5 h-3.5" />
+                JSON Template
+              </button>
+            </div>
           </div>
 
           <UploadZone onFileSelected={handleFileSelected} isLoading={isLoading} />
@@ -192,18 +281,37 @@ export const TeacherPanel: React.FC = () => {
               totalRows={parseResult.totalRows}
             />
 
-            {/* Save Button */}
+            {/* Action Buttons */}
             {canSave && (
-              <div className="mt-6 flex justify-end">
+              <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
+                <button
+                  onClick={() => exportQuestionsToJson(parseResult.questions, fileName ? fileName.replace(/\.[^/.]+$/, '') + '.json' : 'questions.json')}
+                  className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm
+                             bg-slate-800 text-cyan-300 border border-cyan-500/30
+                             hover:bg-slate-700 hover:text-white transition-all duration-200"
+                >
+                  <Download className="w-4 h-4" />
+                  Download as JSON ({parseResult.questions.length})
+                </button>
                 <button
                   onClick={handleSave}
+                  disabled={isSavingCloud}
                   className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm
                              bg-gradient-to-r from-cyan-500 to-blue-500 text-white
                              hover:from-cyan-400 hover:to-blue-400 hover:shadow-lg hover:shadow-cyan-500/25
-                             active:scale-[0.98] transition-all duration-200"
+                             active:scale-[0.98] transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  <Save className="w-4 h-4" />
-                  Save & Apply ({parseResult.questions.length} Questions)
+                  {isSavingCloud ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Syncing to Cloud...
+                    </>
+                  ) : (
+                    <>
+                      <Cloud className="w-4 h-4" />
+                      Save & Sync to Cloud ({parseResult.questions.length} Questions)
+                    </>
+                  )}
                 </button>
               </div>
             )}
@@ -218,7 +326,7 @@ export const TeacherPanel: React.FC = () => {
           ${showSuccess ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'}
         `}>
           <CheckCircle className="w-5 h-5" />
-          <span className="font-semibold text-sm">Questions saved! Game will use your custom set.</span>
+          <span className="font-semibold text-sm">Questions saved & synced to Firebase! All devices will update in real time.</span>
         </div>
 
         {/* Format Guide */}

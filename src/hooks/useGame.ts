@@ -11,7 +11,9 @@ import {
 import { QuestionManager } from '../utils/questionManager';
 import { soundManager } from '../utils/soundManager';
 import { triggerVictoryConfetti, triggerMilestoneBurst } from '../utils/confetti';
-import { loadCustomQuestions } from '../utils/questionStorage';
+import { loadCustomQuestions, syncQuestionsFromCloud } from '../utils/questionStorage';
+import { subscribeToCloudQuestions } from '../services/firebaseQuestions';
+import { QUESTIONS_BANK } from '../data/questions';
 
 export const MAX_CHECKPOINTS = 10;
 export const TOTAL_ROUNDS = 10;
@@ -34,6 +36,25 @@ export function useGame() {
     const custom = loadCustomQuestions();
     return custom ? new QuestionManager(custom) : new QuestionManager();
   });
+
+  // Synchronize questions from Firebase Firestore across all platforms & devices
+  useEffect(() => {
+    syncQuestionsFromCloud().then((cloudQuestions) => {
+      if (cloudQuestions && cloudQuestions.length > 0) {
+        qm.setQuestions(cloudQuestions);
+      }
+    });
+
+    const unsubscribe = subscribeToCloudQuestions((cloudQuestions) => {
+      if (cloudQuestions && cloudQuestions.length > 0) {
+        qm.setQuestions(cloudQuestions);
+      } else {
+        qm.setQuestions(loadCustomQuestions() || QUESTIONS_BANK);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [qm]);
 
   // Round tracking (1 to 10)
   const [roundNumber, setRoundNumber] = useState<number>(1);

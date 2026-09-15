@@ -15,12 +15,14 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelected, isLoadin
     const validTypes = [
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'application/vnd.ms-excel',
+      'application/json',
+      'text/json',
     ];
-    const validExtensions = ['.xlsx', '.xls'];
+    const validExtensions = ['.xlsx', '.xls', '.json'];
     const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
 
     if (!validTypes.includes(file.type) && !validExtensions.includes(ext)) {
-      setError('Please upload an Excel file (.xlsx or .xls)');
+      setError('Please upload an Excel file (.xlsx, .xls) or JSON file (.json)');
       return false;
     }
 
@@ -82,7 +84,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelected, isLoadin
         <input
           ref={inputRef}
           type="file"
-          accept=".xlsx,.xls"
+          accept=".xlsx,.xls,.json,application/json"
           onChange={handleInputChange}
           className="hidden"
         />
@@ -90,7 +92,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelected, isLoadin
         {isLoading ? (
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 rounded-full border-4 border-cyan-400/30 border-t-cyan-400 animate-spin" />
-            <p className="text-slate-300 text-lg">Parsing Excel file...</p>
+            <p className="text-slate-300 text-lg">Parsing questions file...</p>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4">
@@ -110,10 +112,10 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelected, isLoadin
 
             <div>
               <p className="text-white text-lg font-semibold mb-1">
-                {isDragging ? 'Drop your Excel file here' : 'Upload Question Sheet'}
+                {isDragging ? 'Drop your file here' : 'Upload Questions (Excel or JSON)'}
               </p>
               <p className="text-slate-400 text-sm">
-                Drag & drop or click to browse • <span className="text-cyan-400">.xlsx</span> / <span className="text-cyan-400">.xls</span> files
+                Drag & drop or click to browse • <span className="text-cyan-400">.xlsx</span>, <span className="text-cyan-400">.xls</span> or <span className="text-cyan-400">.json</span> files
               </p>
             </div>
           </div>
