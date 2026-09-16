@@ -8,6 +8,7 @@ interface HeaderProps {
   onToggleSound: () => void;
   onHome: () => void;
   onOpenInstructions: () => void;
+  gameCode?: string | null;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSound,
   onHome,
   onOpenInstructions,
+  gameCode,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
@@ -53,8 +55,8 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Center Question Counter Badge */}
-      <div className="flex items-center justify-center">
+      {/* Center Question Counter Badge & Game Code */}
+      <div className="flex items-center justify-center gap-2">
         <div className="px-3 sm:px-5 py-1 sm:py-1.5 rounded-full bg-slate-900/80 border-2 border-sky-400/60 shadow-inner flex items-center gap-2">
           <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-sky-300">
             ROUND
@@ -63,6 +65,12 @@ export const Header: React.FC<HeaderProps> = ({
             {questionNumber}
           </span>
         </div>
+        {gameCode && (
+          <div className="px-2.5 sm:px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/60 text-amber-300 text-xs font-bold tracking-wider font-mono flex items-center gap-1 shadow-sm">
+            <span className="text-[10px] text-amber-400/80 uppercase">CODE:</span>
+            <span>{gameCode}</span>
+          </div>
+        )}
       </div>
 
       {/* Right Controls: Fullscreen, Instructions, Sound Toggle, Home */}

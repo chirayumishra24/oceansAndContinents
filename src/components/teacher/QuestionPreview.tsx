@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Question } from '../../types/game';
 import { ParseError } from '../../utils/excelParser';
 import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 
+type PreviewTab = 'all' | 'teamA' | 'teamB';
+
 interface QuestionPreviewProps {
   questions: Question[];
+  teamAQuestions: Question[];
+  teamBQuestions: Question[];
+  hasTeamSheets: boolean;
   errors: ParseError[];
   warnings: string[];
   totalRows: number;
@@ -12,31 +17,74 @@ interface QuestionPreviewProps {
 
 export const QuestionPreview: React.FC<QuestionPreviewProps> = ({
   questions,
+  teamAQuestions,
+  teamBQuestions,
+  hasTeamSheets,
   errors,
   warnings,
   totalRows,
 }) => {
+  const [activeTab, setActiveTab] = useState<PreviewTab>(hasTeamSheets ? 'teamA' : 'all');
+
   const difficultyColor: Record<string, string> = {
     easy: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
     medium: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
     hard: 'bg-red-500/20 text-red-400 border-red-500/30',
   };
 
+  // Select which questions to show
+  const displayQuestions =
+    activeTab === 'teamA' ? teamAQuestions :
+    activeTab === 'teamB' ? teamBQuestions :
+    questions;
+
   const stats = {
-    easy: questions.filter(q => q.difficulty === 'easy').length,
-    medium: questions.filter(q => q.difficulty === 'medium').length,
-    hard: questions.filter(q => q.difficulty === 'hard').length,
+    easy: displayQuestions.filter(q => q.difficulty === 'easy').length,
+    medium: displayQuestions.filter(q => q.difficulty === 'medium').length,
+    hard: displayQuestions.filter(q => q.difficulty === 'hard').length,
   };
 
-  const categories = [...new Set(questions.map(q => q.category))];
+  const categories = [...new Set(displayQuestions.map(q => q.category))];
+
+  const tabs: { key: PreviewTab; label: string; count: number; color: string }[] = hasTeamSheets
+    ? [
+        { key: 'teamA', label: 'Team A (Red)', count: teamAQuestions.length, color: 'text-red-400 border-red-400' },
+        { key: 'teamB', label: 'Team B (Blue)', count: teamBQuestions.length, color: 'text-blue-400 border-blue-400' },
+        { key: 'all', label: 'All Questions', count: questions.length, color: 'text-slate-300 border-slate-300' },
+      ]
+    : [];
 
   return (
     <div className="space-y-5">
+      {/* Team Tab Switcher */}
+      {hasTeamSheets && (
+        <div className="flex items-center gap-1 p-1 bg-slate-800/60 rounded-xl border border-slate-700/40">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                activeTab === tab.key
+                  ? `bg-slate-700/80 ${tab.color} border border-current shadow-sm`
+                  : 'text-slate-500 hover:text-slate-300 border border-transparent'
+              }`}
+            >
+              <span>{tab.label}</span>
+              <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                activeTab === tab.key ? 'bg-white/10' : 'bg-slate-700/50'
+              }`}>
+                {tab.count}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Stats Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
           <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Total Valid</p>
-          <p className="text-2xl font-bold text-white">{questions.length}<span className="text-slate-500 text-sm font-normal">/{totalRows}</span></p>
+          <p className="text-2xl font-bold text-white">{displayQuestions.length}<span className="text-slate-500 text-sm font-normal">/{activeTab === 'all' ? totalRows : displayQuestions.length}</span></p>
         </div>
         <div className="bg-emerald-500/10 rounded-xl p-4 border border-emerald-500/20">
           <p className="text-emerald-400/70 text-xs uppercase tracking-wider mb-1">Easy</p>
@@ -60,7 +108,7 @@ export const QuestionPreview: React.FC<QuestionPreviewProps> = ({
               key={cat}
               className="px-3 py-1 rounded-full text-xs font-medium bg-blue-500/15 text-blue-300 border border-blue-500/20"
             >
-              {cat} ({questions.filter(q => q.category === cat).length})
+              {cat} ({displayQuestions.filter(q => q.category === cat).length})
             </span>
           ))}
         </div>
@@ -99,7 +147,7 @@ export const QuestionPreview: React.FC<QuestionPreviewProps> = ({
       )}
 
       {/* Questions Table */}
-      {questions.length > 0 && (
+      {displayQuestions.length > 0 && (
         <div className="overflow-hidden rounded-xl border border-slate-700/50">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -114,7 +162,7 @@ export const QuestionPreview: React.FC<QuestionPreviewProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-700/40">
-                {questions.map((q, i) => (
+                {displayQuestions.map((q, i) => (
                   <tr
                     key={q.id}
                     className="bg-slate-900/30 hover:bg-slate-800/40 transition-colors"
@@ -160,9 +208,9 @@ export const QuestionPreview: React.FC<QuestionPreviewProps> = ({
             </table>
           </div>
 
-          {questions.length > 10 && (
+          {displayQuestions.length > 10 && (
             <div className="bg-slate-800/40 px-4 py-2 text-center text-slate-500 text-xs">
-              Showing all {questions.length} questions
+              Showing all {displayQuestions.length} questions
             </div>
           )}
         </div>

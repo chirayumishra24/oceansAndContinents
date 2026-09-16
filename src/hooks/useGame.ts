@@ -6,13 +6,14 @@ import {
   GameStats, 
   SimultaneousRoundStatus,
   WinnerType,
-  FeedbackState
+  FeedbackState,
+  QuestionSet
 } from '../types/game';
 import { QuestionManager } from '../utils/questionManager';
 import { soundManager } from '../utils/soundManager';
 import { triggerVictoryConfetti, triggerMilestoneBurst } from '../utils/confetti';
-import { loadCustomQuestions, syncQuestionsFromCloud } from '../utils/questionStorage';
-import { subscribeToCloudQuestions } from '../services/firebaseQuestions';
+import { loadCustomQuestions, syncQuestionsFromCloud, loadQuestionSetByCode, saveActiveGameCode, loadActiveGameCode, clearActiveGameCode } from '../utils/questionStorage';
+import { subscribeToQuestionSet, subscribeToCloudQuestions } from '../services/firebaseQuestions';
 import { QUESTIONS_BANK } from '../data/questions';
 
 export const MAX_CHECKPOINTS = 10;
@@ -31,30 +32,78 @@ export function useGame() {
   const [screen, setScreen] = useState<ScreenState>('start');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
-  // Question bank manager — load custom questions from localStorage if available
-  const [qm] = useState<QuestionManager>(() => {
-    const custom = loadCustomQuestions();
-    return custom ? new QuestionManager(custom) : new QuestionManager();
-  });
+  // ─── Game Code & Dual Question Managers ───────────────────────
+  const [activeGameCode, setActiveGameCodeState] = useState<string | null>(() => loadActiveGameCode());
+  const [activeQuestionSet, setActiveQuestionSet] = useState<QuestionSet | null>(null);
 
-  // Synchronize questions from Firebase Firestore across all platforms & devices
+  // Two QMs: one for Red (Team A), one for Blue (Team B)
+  const [redQM] = useState<QuestionManager>(() => new QuestionManager());
+  const [blueQM] = useState<QuestionManager>(() => new QuestionManager());
+
+  // Set game code and load question set
+  const setGameCode = useCallback(async (code: string | null) => {
+    if (!code) {
+      setActiveGameCodeState(null);
+      setActiveQuestionSet(null);
+      clearActiveGameCode();
+      // Reset to defaults
+      redQM.setQuestions(QUESTIONS_BANK);
+      blueQM.setQuestions(QUESTIONS_BANK);
+      return;
+    }
+
+    setActiveGameCodeState(code);
+    saveActiveGameCode(code);
+
+    const qs = await loadQuestionSetByCode(code);
+    if (qs) {
+      setActiveQuestionSet(qs);
+      redQM.setQuestions(qs.teamAQuestions);
+      blueQM.setQuestions(qs.teamBQuestions);
+    }
+    return qs;
+  }, [redQM, blueQM]);
+
+  // On mount: load from saved code or fall back to legacy sync
   useEffect(() => {
-    syncQuestionsFromCloud().then((cloudQuestions) => {
-      if (cloudQuestions && cloudQuestions.length > 0) {
-        qm.setQuestions(cloudQuestions);
-      }
-    });
+    const savedCode = loadActiveGameCode();
+    if (savedCode) {
+      loadQuestionSetByCode(savedCode).then((qs) => {
+        if (qs) {
+          setActiveQuestionSet(qs);
+          redQM.setQuestions(qs.teamAQuestions);
+          blueQM.setQuestions(qs.teamBQuestions);
+        } else {
+          // Code no longer valid, clear it
+          clearActiveGameCode();
+          setActiveGameCodeState(null);
+        }
+      });
+    } else {
+      // Legacy: try loading from old cloud sync
+      syncQuestionsFromCloud().then((questions) => {
+        if (questions && questions.length > 0) {
+          redQM.setQuestions(questions);
+          blueQM.setQuestions(questions);
+        }
+      });
+    }
+  }, [redQM, blueQM]);
 
-    const unsubscribe = subscribeToCloudQuestions((cloudQuestions) => {
-      if (cloudQuestions && cloudQuestions.length > 0) {
-        qm.setQuestions(cloudQuestions);
-      } else {
-        qm.setQuestions(loadCustomQuestions() || QUESTIONS_BANK);
+  // Real-time subscription when a code is active
+  useEffect(() => {
+    if (!activeGameCode) return;
+
+    const unsubscribe = subscribeToQuestionSet(activeGameCode, (qs) => {
+      if (qs) {
+        setActiveQuestionSet(qs);
+        redQM.setQuestions(qs.teamAQuestions);
+        blueQM.setQuestions(qs.teamBQuestions);
       }
     });
 
     return () => unsubscribe();
-  }, [qm]);
+  }, [activeGameCode, redQM, blueQM]);
 
   // Round tracking (1 to 10)
   const [roundNumber, setRoundNumber] = useState<number>(1);
@@ -104,10 +153,10 @@ export function useGame() {
     setSoundEnabled(newState);
   }, []);
 
-  // Draw 2 distinct questions for the new round
+  // Draw 2 distinct questions for the new round (from separate pools)
   const loadNextRound = useCallback((round: number) => {
-    const qRed = qm.getNextQuestion();
-    const qBlue = qm.getNextQuestion();
+    const qRed = redQM.getNextQuestion();
+    const qBlue = blueQM.getNextQuestion();
 
     if (!qRed || !qBlue) {
       // Determine winner based on positions
@@ -129,12 +178,13 @@ export function useGame() {
     setEvaluation(null);
     setFeedback(null);
     setRoundStatus('answering');
-  }, [qm, redPosition, bluePosition]);
+  }, [redQM, blueQM, redPosition, bluePosition]);
 
   // Start complete race
   const startRace = useCallback(() => {
     soundManager.playStartSound();
-    qm.reset();
+    redQM.reset();
+    blueQM.reset();
     setRoundNumber(1);
     setRedPosition(0);
     setBluePosition(0);
@@ -154,8 +204,8 @@ export function useGame() {
       blueSkipsUsed: 0,
     });
 
-    const qRed = qm.getNextQuestion();
-    const qBlue = qm.getNextQuestion();
+    const qRed = redQM.getNextQuestion();
+    const qBlue = blueQM.getNextQuestion();
 
     setRedQuestion(qRed);
     setBlueQuestion(qBlue);
@@ -163,7 +213,7 @@ export function useGame() {
     setBlueSelected(null);
     setRoundStatus('answering');
     setScreen('race');
-  }, [qm]);
+  }, [redQM, blueQM]);
 
   // Evaluate the answers submitted by both teams
   const evaluateAnswers = useCallback((
@@ -252,7 +302,7 @@ export function useGame() {
       blueCorrect: prev.blueCorrect + (isBlueCorrect ? 1 : 0),
     }));
 
-    // Check if someone reached the finish line (at least 1 team reaches MAX_CHECKPOINTS)
+    // Check if someone reached the finish line
     const isGameFinished = (newRedPos >= MAX_CHECKPOINTS) || (newBluePos >= MAX_CHECKPOINTS);
 
     if (isGameFinished) {
@@ -322,24 +372,24 @@ export function useGame() {
     if (roundStatus !== 'answering' || redSkips <= 0 || redSelected !== null) return;
     soundManager.playClickSound();
     setRedSkips(prev => prev - 1);
-    const newQ = qm.getNextQuestion();
+    const newQ = redQM.getNextQuestion();
     if (newQ) {
       setRedQuestion(newQ);
     }
     setStats(prev => ({ ...prev, redSkipsUsed: prev.redSkipsUsed + 1 }));
-  }, [roundStatus, redSkips, redSelected, qm]);
+  }, [roundStatus, redSkips, redSelected, redQM]);
 
   // Team Blue Skip
   const handleBlueSkip = useCallback(() => {
     if (roundStatus !== 'answering' || blueSkips <= 0 || blueSelected !== null) return;
     soundManager.playClickSound();
     setBlueSkips(prev => prev - 1);
-    const newQ = qm.getNextQuestion();
+    const newQ = blueQM.getNextQuestion();
     if (newQ) {
       setBlueQuestion(newQ);
     }
     setStats(prev => ({ ...prev, blueSkipsUsed: prev.blueSkipsUsed + 1 }));
-  }, [roundStatus, blueSkips, blueSelected, qm]);
+  }, [roundStatus, blueSkips, blueSelected, blueQM]);
 
   // Clean up timeouts on unmount
   useEffect(() => {
@@ -380,6 +430,10 @@ export function useGame() {
     returnToHome: () => {
       soundManager.playClickSound();
       setScreen('start');
-    }
+    },
+    // New: game code management
+    activeGameCode,
+    activeQuestionSet,
+    setGameCode,
   };
 }

@@ -39,6 +39,7 @@ export const RaceScreen: React.FC<RaceScreenProps> = ({ game }) => {
         onToggleSound={game.toggleSound}
         onHome={game.returnToHome}
         onOpenInstructions={() => setIsInstructionsOpen(true)}
+        gameCode={game.activeGameCode}
       />
 
       {/* Main Content Area: Expanded Width Race Track & 2 Team Cards */}

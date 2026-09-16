@@ -20,6 +20,8 @@ const GameScreen: React.FC = () => {
           onOpenInstructions={() => setIsInstructionsOpen(true)}
           soundEnabled={game.soundEnabled}
           onToggleSound={game.toggleSound}
+          activeGameCode={game.activeGameCode}
+          onCodeSubmit={game.setGameCode}
         />
       )}
 
@@ -38,7 +40,7 @@ const GameScreen: React.FC = () => {
         />
       )}
 
-      {/* INSTRUCTIONS MODAL (can be opened before race or during game) */}
+      {/* INSTRUCTIONS MODAL */}
       <InstructionsModal
         isOpen={isInstructionsOpen}
         onClose={() => setIsInstructionsOpen(false)}

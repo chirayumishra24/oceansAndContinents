@@ -67,3 +67,12 @@ export interface GameStats {
   redSkipsUsed: number;
   blueSkipsUsed: number;
 }
+
+export interface QuestionSet {
+  code: string;
+  teamAQuestions: Question[];
+  teamBQuestions: Question[];
+  createdAt: number;
+  createdBy?: string;
+  totalQuestions: number;
+}

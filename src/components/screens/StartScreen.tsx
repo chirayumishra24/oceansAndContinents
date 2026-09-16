@@ -2,21 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Ship } from '../race/Ship';
 import { ContinentsMapDecor } from '../race/ContinentsMapDecor';
-import { Play, Volume2, VolumeX, Compass, Anchor, Maximize, Minimize, GraduationCap } from 'lucide-react';
+import { Play, Volume2, VolumeX, Compass, Anchor, Maximize, Minimize, GraduationCap, Hash, CheckCircle2, XCircle, Loader2, X } from 'lucide-react';
+import { QuestionSet } from '../../types/game';
 
 interface StartScreenProps {
   onStart: () => void;
   onOpenInstructions?: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  activeGameCode: string | null;
+  onCodeSubmit: (code: string | null) => Promise<QuestionSet | null | undefined>;
 }
 
 export const StartScreen: React.FC<StartScreenProps> = ({
   onStart,
   soundEnabled,
   onToggleSound,
+  activeGameCode,
+  onCodeSubmit,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [codeInput, setCodeInput] = useState<string>('');
+  const [codeStatus, setCodeStatus] = useState<'idle' | 'loading' | 'valid' | 'invalid'>('idle');
+  const [codeDetails, setCodeDetails] = useState<string>('');
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -26,11 +34,54 @@ export const StartScreen: React.FC<StartScreenProps> = ({
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
+  // If there's already an active code, show it
+  useEffect(() => {
+    if (activeGameCode) {
+      setCodeInput(activeGameCode);
+      setCodeStatus('valid');
+    }
+  }, [activeGameCode]);
+
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen?.().catch(() => {});
     } else {
       document.exitFullscreen?.().catch(() => {});
+    }
+  };
+
+  const handleCodeSubmit = async () => {
+    const trimmed = codeInput.trim();
+    if (trimmed.length < 4) return;
+
+    setCodeStatus('loading');
+    try {
+      const result = await onCodeSubmit(trimmed);
+      if (result) {
+        setCodeStatus('valid');
+        const aCount = result.teamAQuestions?.length || 0;
+        const bCount = result.teamBQuestions?.length || 0;
+        setCodeDetails(`${aCount} questions for Team A · ${bCount} for Team B`);
+      } else {
+        setCodeStatus('invalid');
+        setCodeDetails('');
+      }
+    } catch {
+      setCodeStatus('invalid');
+      setCodeDetails('');
+    }
+  };
+
+  const handleClearCode = async () => {
+    setCodeInput('');
+    setCodeStatus('idle');
+    setCodeDetails('');
+    await onCodeSubmit(null);
+  };
+
+  const handleCodeKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleCodeSubmit();
     }
   };
 
@@ -161,6 +212,86 @@ export const StartScreen: React.FC<StartScreenProps> = ({
             Two teams. One ocean.<br />
             One goal — <strong className="text-amber-600 font-extrabold">Reach the Finish Line First!</strong>
           </p>
+        </div>
+
+        {/* ════════════════════════════════════════════════════════ */}
+        {/* GAME CODE ENTRY */}
+        {/* ════════════════════════════════════════════════════════ */}
+        <div className="mt-4 w-full max-w-sm">
+          <div className="bg-sky-950/80 backdrop-blur-sm rounded-2xl border-2 border-sky-600/50 p-4 shadow-xl">
+            <div className="flex items-center gap-2 mb-3">
+              <Hash className="w-4 h-4 text-cyan-400" />
+              <span className="text-xs font-bold text-cyan-300 uppercase tracking-wider">Enter Game Code</span>
+            </div>
+
+            {codeStatus === 'valid' && activeGameCode ? (
+              /* ── Code Active State ── */
+              <div className="space-y-2">
+                <div className="flex items-center justify-between bg-emerald-500/15 border border-emerald-500/30 rounded-xl px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    <div className="text-left">
+                      <p className="text-white font-mono font-bold text-lg tracking-[0.3em]">{activeGameCode}</p>
+                      {codeDetails && (
+                        <p className="text-emerald-300/80 text-[10px]">{codeDetails}</p>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleClearCode}
+                    className="p-1.5 rounded-lg bg-slate-700/60 hover:bg-red-500/30 text-slate-400 hover:text-red-400 transition-colors"
+                    title="Clear code and use default questions"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <p className="text-emerald-400/70 text-[10px] text-center">Question set loaded successfully</p>
+              </div>
+            ) : (
+              /* ── Code Input State ── */
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={codeInput}
+                    onChange={(e) => {
+                      setCodeInput(e.target.value.replace(/[^0-9]/g, ''));
+                      if (codeStatus === 'invalid') setCodeStatus('idle');
+                    }}
+                    onKeyDown={handleCodeKeyDown}
+                    placeholder="Enter 4-digit code"
+                    className="flex-1 bg-sky-900/60 border-2 border-sky-600/40 rounded-xl px-4 py-2.5 text-white font-mono text-lg tracking-[0.3em] text-center placeholder:text-sky-600/60 placeholder:tracking-normal placeholder:text-sm focus:outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20 transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCodeSubmit}
+                    disabled={codeInput.length < 4 || codeStatus === 'loading'}
+                    className="px-5 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-b from-cyan-400 to-cyan-600 hover:from-cyan-300 hover:to-cyan-500 text-sky-950 border-2 border-cyan-300/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95 shadow-md"
+                  >
+                    {codeStatus === 'loading' ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      'Join'
+                    )}
+                  </button>
+                </div>
+
+                {codeStatus === 'invalid' && (
+                  <div className="flex items-center gap-2 text-red-400 text-xs bg-red-500/10 rounded-lg px-3 py-2 border border-red-500/20">
+                    <XCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span>Code not found. Check with your teacher.</span>
+                  </div>
+                )}
+
+                <p className="text-sky-400/50 text-[10px] text-center">
+                  No code? Default questions will be used
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Large START Button */}
