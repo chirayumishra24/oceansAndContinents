@@ -75,8 +75,8 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelected, isLoadin
           relative cursor-pointer rounded-2xl border-2 border-dashed p-10
           transition-all duration-300 ease-out text-center
           ${isDragging
-            ? 'border-cyan-400 bg-cyan-500/10 scale-[1.02] shadow-lg shadow-cyan-500/20'
-            : 'border-slate-600 bg-slate-800/50 hover:border-cyan-500/60 hover:bg-slate-800/80'
+            ? 'border-sky-500 bg-sky-50 scale-[1.02] shadow-lg shadow-sky-500/20'
+            : 'border-slate-300 bg-slate-50/80 hover:border-sky-400 hover:bg-sky-50/50'
           }
           ${isLoading ? 'pointer-events-none opacity-60' : ''}
         `}
@@ -91,16 +91,16 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelected, isLoadin
 
         {isLoading ? (
           <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 rounded-full border-4 border-cyan-400/30 border-t-cyan-400 animate-spin" />
-            <p className="text-slate-300 text-lg">Parsing questions file...</p>
+            <div className="w-12 h-12 rounded-full border-4 border-sky-400/30 border-t-sky-500 animate-spin" />
+            <p className="text-slate-600 text-base font-semibold">Parsing questions file...</p>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4">
             <div className={`
-              w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300
+              w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm
               ${isDragging
-                ? 'bg-cyan-500/20 text-cyan-300 scale-110'
-                : 'bg-gradient-to-br from-cyan-500/20 to-blue-500/20 text-cyan-400'
+                ? 'bg-sky-100 text-sky-600 scale-110'
+                : 'bg-gradient-to-br from-sky-100 to-blue-100 text-sky-600 border border-sky-200'
               }
             `}>
               {isDragging ? (
@@ -111,11 +111,11 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelected, isLoadin
             </div>
 
             <div>
-              <p className="text-white text-lg font-semibold mb-1">
+              <p className="text-slate-900 text-lg font-bold mb-1">
                 {isDragging ? 'Drop your file here' : 'Upload Questions (Excel or JSON)'}
               </p>
-              <p className="text-slate-400 text-sm">
-                Drag & drop or click to browse • <span className="text-cyan-400">.xlsx</span>, <span className="text-cyan-400">.xls</span> or <span className="text-cyan-400">.json</span> files
+              <p className="text-slate-500 text-sm">
+                Drag & drop or click to browse • <span className="text-sky-600 font-semibold">.xlsx</span>, <span className="text-sky-600 font-semibold">.xls</span> or <span className="text-sky-600 font-semibold">.json</span> files
               </p>
             </div>
           </div>
@@ -123,8 +123,8 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelected, isLoadin
       </div>
 
       {error && (
-        <div className="mt-3 flex items-center gap-2 text-red-400 text-sm bg-red-500/10 rounded-lg px-4 py-2.5">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+        <div className="mt-3 flex items-center gap-2 text-red-700 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-2.5">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-500" />
           <span>{error}</span>
         </div>
       )}
