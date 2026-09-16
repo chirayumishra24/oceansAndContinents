@@ -26,6 +26,7 @@ import {
   Hash,
   Clock,
   X,
+  AlertTriangle,
 } from 'lucide-react';
 
 export const TeacherPanel: React.FC = () => {
@@ -38,6 +39,7 @@ export const TeacherPanel: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     setTeacherCodes(loadTeacherCodes());
@@ -72,6 +74,7 @@ export const TeacherPanel: React.FC = () => {
     if (teamA.length === 0 && teamB.length === 0) return;
 
     setIsSavingCloud(true);
+    setSaveError(null);
     try {
       const code = await saveQuestionSetToCloud(teamA, teamB);
       setGeneratedCode(code);
@@ -80,6 +83,7 @@ export const TeacherPanel: React.FC = () => {
       setTimeout(() => setShowSuccess(false), 5000);
     } catch (err) {
       console.error('Failed to save questions to cloud:', err);
+      setSaveError((err as Error).message || 'Failed to save questions to cloud.');
     } finally {
       setIsSavingCloud(false);
     }
@@ -155,9 +159,9 @@ export const TeacherPanel: React.FC = () => {
         </div>
 
         {/* ════════════════════════════════════════════════════════ */}
-        {/* GENERATED CODE DISPLAY (after save) */}
+        {/* GENERATED CODE DISPLAY (top banner if no file uploaded) */}
         {/* ════════════════════════════════════════════════════════ */}
-        {generatedCode && (
+        {!parseResult && generatedCode && (
           <div className="mb-8 rounded-2xl overflow-hidden border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-cyan-500/5">
             <div className="p-6 sm:p-8 text-center">
               <div className="flex items-center justify-center gap-2 mb-3">
@@ -312,9 +316,60 @@ export const TeacherPanel: React.FC = () => {
               totalRows={parseResult.totalRows}
             />
 
+            {/* ════════════════════════════════════════════════════════ */}
+            {/* CENTER GENERATED CODE DISPLAY (In this section)        */}
+            {/* ════════════════════════════════════════════════════════ */}
+            {generatedCode && (
+              <div className="mt-8 mb-4 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-emerald-950/60 via-slate-900 to-cyan-950/40 border-2 border-emerald-400/80 shadow-2xl flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-300">
+                <div className="flex items-center gap-2 mb-2 text-emerald-400 font-bold text-xs sm:text-sm uppercase tracking-wider">
+                  <CheckCircle className="w-5 h-5 text-emerald-400" />
+                  <span>Question Set Saved & Code Active!</span>
+                </div>
+                <p className="text-slate-300 text-xs sm:text-sm mb-4">
+                  Share this 4-digit game code with your students to load this question set:
+                </p>
+
+                <div className="inline-flex items-center gap-4 bg-slate-950 rounded-2xl px-8 py-4 border-2 border-emerald-400 shadow-inner">
+                  <span className="text-4xl sm:text-6xl font-mono font-black text-amber-300 tracking-[0.35em]">
+                    {generatedCode}
+                  </span>
+                  <button
+                    onClick={() => handleCopyCode(generatedCode)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-sm font-bold transition-all hover:scale-105 active:scale-95 shadow-sm"
+                    title="Copy code"
+                  >
+                    {copiedCode ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 text-emerald-400" />
+                        <span>Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        <span>Copy Code</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <p className="mt-4 text-slate-400 text-xs flex items-center gap-1.5">
+                  <span>Students enter this code on the</span>
+                  <strong className="text-white font-semibold">Start Screen → Join Game</strong>
+                </p>
+              </div>
+            )}
+
+            {/* Error message if save fails */}
+            {saveError && (
+              <div className="mt-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs sm:text-sm flex items-center gap-2 justify-center text-center">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-red-400" />
+                <span>{saveError}</span>
+              </div>
+            )}
+
             {/* Action Buttons */}
             {canSave && (
-              <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
                 <button
                   onClick={() => exportQuestionsToJson(parseResult.questions, fileName ? fileName.replace(/\.[^/.]+$/, '') + '.json' : 'questions.json')}
                   className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm
@@ -324,6 +379,22 @@ export const TeacherPanel: React.FC = () => {
                   <Download className="w-4 h-4" />
                   Download as JSON
                 </button>
+
+                {/* Center Code Badge if generated */}
+                {generatedCode && (
+                  <div className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-slate-950 border-2 border-emerald-400/80 shadow-md">
+                    <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">GAME CODE:</span>
+                    <span className="text-2xl font-mono font-black text-amber-300 tracking-[0.25em]">{generatedCode}</span>
+                    <button
+                      onClick={() => handleCopyCode(generatedCode)}
+                      className="p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 transition-all hover:scale-105"
+                      title="Copy code"
+                    >
+                      {copiedCode ? <CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                )}
+
                 <button
                   onClick={handleSave}
                   disabled={isSavingCloud}
@@ -340,7 +411,7 @@ export const TeacherPanel: React.FC = () => {
                   ) : (
                     <>
                       <Cloud className="w-4 h-4" />
-                      Save & Get Game Code
+                      {generatedCode ? 'Update & Get New Code' : 'Save & Get Game Code'}
                     </>
                   )}
                 </button>
