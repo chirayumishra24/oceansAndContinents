@@ -57,6 +57,7 @@ export const App: React.FC = () => {
     <Routes>
       <Route path="/" element={<GameScreen />} />
       <Route path="/teacher" element={<TeacherPanel />} />
+      <Route path="*" element={<GameScreen />} />
     </Routes>
   );
 };

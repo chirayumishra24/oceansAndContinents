@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Ship } from '../race/Ship';
 import { ContinentsMapDecor } from '../race/ContinentsMapDecor';
-import { Play, Volume2, VolumeX, Compass, Anchor, Maximize, Minimize } from 'lucide-react';
+import { Play, Volume2, VolumeX, Compass, Anchor, Maximize, Minimize, GraduationCap } from 'lucide-react';
 
 interface StartScreenProps {
   onStart: () => void;
@@ -81,6 +82,16 @@ export const StartScreen: React.FC<StartScreenProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Teacher Portal Link */}
+          <Link
+            to="/teacher"
+            className="inline-flex items-center gap-2 bg-sky-950/80 hover:bg-sky-900 border-2 border-amber-400/80 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-black text-amber-300 hover:text-amber-200 shadow-md transition-all hover:scale-105"
+            title="Teacher Portal - Manage & Upload Questions"
+          >
+            <GraduationCap className="w-4 h-4 text-amber-400" />
+            <span>Teacher Portal</span>
+          </Link>
+
           {/* Fullscreen Toggle */}
           <button
             type="button"
