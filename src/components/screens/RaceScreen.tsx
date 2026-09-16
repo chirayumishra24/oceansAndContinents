@@ -15,18 +15,12 @@ export const RaceScreen: React.FC<RaceScreenProps> = ({ game }) => {
 
   // Hook 30s timer for the simultaneous round
   const isTimerRunning = game.roundStatus === 'answering';
-  const { timeLeft, resetTimer, isUrgent } = useTimer({
+  const { timeLeft, isUrgent } = useTimer({
     initialSeconds: 30,
     isRunning: isTimerRunning,
     onTimeout: game.handleRoundTimeout,
+    roundKey: game.roundNumber,
   });
-
-  // Reset timer on new round or question
-  React.useEffect(() => {
-    if (game.roundStatus === 'answering') {
-      resetTimer(30);
-    }
-  }, [game.roundStatus, game.roundNumber, resetTimer]);
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-gradient-to-b from-sky-200 via-sky-100 to-sky-300">
