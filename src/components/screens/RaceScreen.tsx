@@ -13,10 +13,10 @@ interface RaceScreenProps {
 export const RaceScreen: React.FC<RaceScreenProps> = ({ game }) => {
   const [isInstructionsOpen, setIsInstructionsOpen] = useState<boolean>(false);
 
-  // Hook 15s timer for the simultaneous round
+  // Hook 30s timer for the simultaneous round
   const isTimerRunning = game.roundStatus === 'answering';
   const { timeLeft, resetTimer, isUrgent } = useTimer({
-    initialSeconds: 15,
+    initialSeconds: 30,
     isRunning: isTimerRunning,
     onTimeout: game.handleRoundTimeout,
   });
@@ -24,7 +24,7 @@ export const RaceScreen: React.FC<RaceScreenProps> = ({ game }) => {
   // Reset timer on new round or question
   React.useEffect(() => {
     if (game.roundStatus === 'answering') {
-      resetTimer(15);
+      resetTimer(30);
     }
   }, [game.roundStatus, game.roundNumber, resetTimer]);
 

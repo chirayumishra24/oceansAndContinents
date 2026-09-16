@@ -143,7 +143,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         <div className="flex flex-row lg:flex-col items-center justify-center gap-4 shrink-0 pt-2 lg:pt-0">
           <TimerRing 
             seconds={timeLeft} 
-            maxSeconds={15} 
+            maxSeconds={30} 
             isUrgent={isUrgent} 
           />
           <SkipButton 

@@ -9,7 +9,7 @@ interface TimerRingProps {
 
 export const TimerRing: React.FC<TimerRingProps> = ({
   seconds,
-  maxSeconds = 15,
+  maxSeconds = 30,
   isUrgent = false,
 }) => {
   const radius = 24;

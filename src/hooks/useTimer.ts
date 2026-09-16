@@ -7,7 +7,7 @@ interface UseTimerProps {
   isRunning: boolean;
 }
 
-export function useTimer({ initialSeconds = 15, onTimeout, isRunning }: UseTimerProps) {
+export function useTimer({ initialSeconds = 30, onTimeout, isRunning }: UseTimerProps) {
   const [timeLeft, setTimeLeft] = useState<number>(initialSeconds);
   const onTimeoutRef = useRef(onTimeout);
 

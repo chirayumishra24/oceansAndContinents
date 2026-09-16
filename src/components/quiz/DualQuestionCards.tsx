@@ -196,7 +196,7 @@ export const DualQuestionCards: React.FC<DualQuestionCardsProps> = ({
               </span>
             </div>
 
-            <TimerRing seconds={timeLeft} maxSeconds={15} isUrgent={isUrgent} />
+            <TimerRing seconds={timeLeft} maxSeconds={30} isUrgent={isUrgent} />
 
             <div className="hidden lg:flex items-center gap-1 px-3 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-[11px] font-black text-amber-300 shadow">
               <Anchor className="w-3.5 h-3.5 text-amber-400" />

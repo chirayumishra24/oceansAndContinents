@@ -311,7 +311,7 @@ export function useGame() {
     }
   }, [roundStatus, blueSelected, redSelected, evaluateAnswers]);
 
-  // Handle round timer expiration (15s)
+  // Handle round timer expiration (30s)
   const handleRoundTimeout = useCallback(() => {
     if (roundStatus !== 'answering') return;
     evaluateAnswers(redSelected, blueSelected);
